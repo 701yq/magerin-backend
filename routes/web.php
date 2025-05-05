@@ -6,8 +6,7 @@ use App\Http\Controllers\Api\AuthApiController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LaporanController;
-use App\Http\Controllers\AdminController;
-
+use App\Http\Controllers\Auth\SocialiteController;
 
 
 /*
@@ -29,10 +28,14 @@ Route::get('/firebase-users', [FirebaseController::class, 'getUsers']);
 Route::get('/login', [AuthApiController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthApiController::class, 'login']);
 Route::get('/logout', [AuthApiController::class, 'logout']);
-Route::middleware(['isAdmin'])->group(function () {
-    Route::get('/admin/me', [AdminController::class, 'me']);
-    Route::get('/admin/users', [AdminController::class, 'users']);
-});
+Route::get('/auth/redirect/{provider}', [SocialiteController::class, 'redirectToProvider']); //ini yg baru
+Route::get('/auth/callback/{provider}', [SocialiteController::class, 'handleProviderCallback']);// ini yg baru
+//Route::middleware(['isAdmin'])->group(function () {
+//    Route::get('/admin/me', [AdminDashboardController::class, 'me']);
+//    Route::get('/admin/users', [AdminDashboardController::class, 'users']);
+
+
+//});
 
 
 

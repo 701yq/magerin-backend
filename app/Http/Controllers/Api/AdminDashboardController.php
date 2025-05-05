@@ -24,13 +24,30 @@ class AdminDashboardController extends Controller
         $totalUsers = 0;
         $activeUsers = 0;
 
+        // Inisialisasi data per bulan (Jan–Des, index 0–11)
+        $monthlyUsers = array_fill(0, 12, 0);
+
         foreach ($users as $user) {
             $data = $user->data();
+
             if (isset($data['role']) && $data['role'] === 'user') {
                 $totalUsers++;
 
                 if (isset($data['status']) && strtolower($data['status']) === 'aktif') {
                     $activeUsers++;
+                }
+
+                // Hitung berdasarkan created_at jika ada
+                if (!empty($data['created_at'])) {
+                    try {
+                        $timestamp = strtotime($data['created_at']);
+                        $monthIndex = (int)date('n', $timestamp) - 1; // Januari = 0
+                        if ($monthIndex >= 0 && $monthIndex < 12) {
+                            $monthlyUsers[$monthIndex]++;
+                        }
+                    } catch (\Exception $e) {
+                        // Lewati jika format tanggal invalid
+                    }
                 }
             }
         }
@@ -44,6 +61,13 @@ class AdminDashboardController extends Controller
                 'total_users' => $totalUsers,
                 'active_users' => $activeUsers,
                 'total_reports' => $totalReports,
+                'chart' => [
+                    'labels' => [
+                        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+                    ],
+                    'values' => $monthlyUsers
+                ]
             ]
         ]);
     }
